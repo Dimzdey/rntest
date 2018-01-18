@@ -9,7 +9,7 @@ mongoose.Promise = global.Promise;
 mongoose.connect( "mongodb://" + config.mongo.user + ":" + encodeURIComponent(mongoPassword) + "@" + 
 config.mongo.hostString);
 mongoose.connection.on('connected', () => {
-    console.log('connected to database);
+    console.log('connected to database');
 });
 
 mongoose.connection.on('error', (err) => {
@@ -25,7 +25,7 @@ app.use(bodyParser.json());
 const api = require('./routes/api');
 app.use('/api', api);
 
-app.listen(port, () => {
+app.listen(process.env.PORT, () => {
     console.log('Server started listen on port: ' + port);
 });
 
