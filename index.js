@@ -1,10 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const config = require('./config/config');
+const conf = require('./config/config');
 const bodyParser = require('body-parser');
 
+const config = JSON.parse(process.env.APP_CONFIG);
+
 mongoose.Promise = global.Promise;
-mongoose.connect(config.database);
+mongoose.connect( "mongodb://" + config.mongo.user + ":" + encodeURIComponent(mongoPassword) + "@" + 
+config.mongo.hostString ||config.database);
 mongoose.connection.on('connected', () => {
     console.log('connected to database: ' + config.database);
 });
