@@ -7,9 +7,9 @@ const config = JSON.parse(process.env.APP_CONFIG);
 
 mongoose.Promise = global.Promise;
 mongoose.connect( "mongodb://" + config.mongo.user + ":" + encodeURIComponent(mongoPassword) + "@" + 
-config.mongo.hostString ||config.database);
+config.mongo.hostString);
 mongoose.connection.on('connected', () => {
-    console.log('connected to database: ' + config.database);
+    console.log('connected to database);
 });
 
 mongoose.connection.on('error', (err) => {
