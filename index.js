@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const conf = require('./config/config');
 const bodyParser = require('body-parser');
 
+const mongoPassword = '123456';
 const config = JSON.parse(process.env.APP_CONFIG);
 
 mongoose.Promise = global.Promise;
