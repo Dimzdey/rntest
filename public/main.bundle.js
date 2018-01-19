@@ -175,7 +175,7 @@ var ApiService = (function () {
 /***/ "../../../../../src/app/user-list/user-list.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "<form [formGroup]=\"form\" (ngSubmit)=\"createUser(form.value)\"\n   class=\"d-flex justify-content-between\" *ngIf=\"!addFormVisible\">\n  <div class=\"form-group\">\n    <label for=\"firstname\">First Name</label>\n    <input type=\"text\" class=\"form-control\" id=\"firstname\"\n      placeholder=\"First Name\" formControlName=\"firstname\">\n  </div>\n  <div class=\"form-group\">\n    <label for=\"lastname\">Last Name</label>\n    <input type=\"text\" class=\"form-control\" id=\"lastname\"\n      placeholder=\"Last Name\" formControlName=\"lastname\">\n  </div>\n  <div class=\"form-group\">\n    <label for=\"email\">Email</label>\n    <input type=\"text\" class=\"form-control\" id=\"email\"\n      placeholder=\"Email\" formControlName=\"email\">\n  </div>\n  <div class=\"row\">\n    <button class=\"btn btn-success\" [disabled]=\"!form.valid\"\n      type=\"submit\">Add</button>\n  </div>\n</form>\n\n<div class=\"row\">\n  <table class=\"table\">\n    <thead>\n      <tr>\n        <th>First Name</th>\n        <th>Last Name</th>\n        <th>Email</th>\n        <th>\n          <button class=\"btn btn-default\" (click)=\"addFormVisible = !addFormVisible\">\n            Add New Row</button>\n        </th>\n      </tr>\n    </thead>\n    <tbody *ngIf=\"users\">\n      <tr *ngFor=\"let user of users; let i = index\"\n        [ngClass]=\"{'table-danger': user.firstname == 'Danger', \n                  'table-success':  user.firstname == 'Success',\n                  'table-active': user.firstname == 'Active',\n                  'table-warning': user.firstname == 'Warning',\n                  'table-info': user.firstname == 'Info' }\">\n        <td>{{user.firstname}}</td>\n        <td>{{user.lastname}}</td>\n        <td>{{user.email}}</td>\n        <td class=\"d-flex justify-content-end\">\n          <button type=\"button\" class=\"btn btn-primary\">\n            <i class=\"fa fa-pencil\" aria-hidden=\"true\"></i>\n          </button>\n          <button type=\"button\" class=\"btn btn-primary\"\n            (click)=\"deleteUser(user._id)\">\n            <i class=\"fa fa-trash\" aria-hidden=\"true\"></i>\n          </button>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n</div>\n"
+module.exports = "<form [formGroup]=\"form\" (ngSubmit)=\"createUser(form.value)\"\n   class=\"d-flex justify-content-between\" *ngIf=\"!addFormVisible\">\n  <div class=\"form-group\">\n    <label for=\"firstname\">First Name</label>\n    <input type=\"text\" class=\"form-control\" id=\"firstname\"\n      placeholder=\"First Name\" formControlName=\"firstname\">\n  </div>\n  <div class=\"form-group\">\n    <label for=\"lastname\">Last Name</label>\n    <input type=\"text\" class=\"form-control\" id=\"lastname\"\n      placeholder=\"Last Name\" formControlName=\"lastname\">\n  </div>\n  <div class=\"form-group\">\n    <label for=\"email\">Email</label>\n    <input type=\"text\" class=\"form-control\" id=\"email\"\n      placeholder=\"Email\" formControlName=\"email\">\n  </div>\n  <div class=\"row\">\n    <button *ngIf=\"edit\" class=\"btn btn-success\" [disabled]=\"!form.valid\"\n    (click)=\"updateUser($event)\">Update</button>\n    <button *ngIf=\"!edit\" class=\"btn btn-success\" [disabled]=\"!form.valid\"\n      type=\"submit\">Add</button>\n  </div>\n</form>\n\n<div class=\"row\">\n  <table class=\"table\">\n    <thead>\n      <tr>\n        <th>First Name</th>\n        <th>Last Name</th>\n        <th>Email</th>\n        <th>\n          <button class=\"btn btn-default\" (click)=\"addFormVisible = !addFormVisible\">\n            Add New Row</button>\n        </th>\n      </tr>\n    </thead>\n    <tbody *ngIf=\"users\">\n      <tr *ngFor=\"let user of users; let i = index\"\n        [ngClass]=\"{'table-danger': user.firstname == 'Danger', \n                  'table-success':  user.firstname == 'Success',\n                  'table-active': user.firstname == 'Active',\n                  'table-warning': user.firstname == 'Warning',\n                  'table-info': user.firstname == 'Info' }\">\n        <td>{{user.firstname}}</td>\n        <td>{{user.lastname}}</td>\n        <td>{{user.email}}</td>\n        <td class=\"d-flex justify-content-end\">\n          <button type=\"button\" class=\"btn btn-primary\" (click)=\"userId = user._id; editUser(user)\">\n            <i class=\"fa fa-pencil\" aria-hidden=\"true\"></i>\n          </button>\n          <button type=\"button\" class=\"btn btn-primary\"\n            (click)=\"deleteUser(user._id)\">\n            <i class=\"fa fa-trash\" aria-hidden=\"true\"></i>\n          </button>\n        </td>\n      </tr>\n    </tbody>\n  </table>\n</div>\n"
 
 /***/ }),
 
@@ -204,6 +204,7 @@ var UserListComponent = (function () {
         this._userService = _userService;
         this.fb = fb;
         this.addFormVisible = true;
+        this.edit = false;
         this.form = fb.group({
             'firstname': ['', __WEBPACK_IMPORTED_MODULE_2__angular_forms__["d" /* Validators */].required],
             'lastname': ['', __WEBPACK_IMPORTED_MODULE_2__angular_forms__["d" /* Validators */].required],
@@ -228,23 +229,35 @@ var UserListComponent = (function () {
             _this.getUsers();
         });
     };
-    UserListComponent.prototype.updateUser = function (id, user) {
+    UserListComponent.prototype.updateUser = function ($event) {
         var _this = this;
-        this._userService.updateUser(id, user).subscribe(function (data) {
-            console.log(data);
-            _this.getUsers();
-        });
+        $event.preventDefault();
+        if (this.form.valid) {
+            this._userService.updateUser(this.userId, this.form.value).subscribe(function (data) {
+                console.log(data);
+                _this.edit = false;
+                _this.addFormVisible = true;
+                _this.form.reset();
+                _this.getUsers();
+            });
+        }
     };
     UserListComponent.prototype.createUser = function (user) {
         var _this = this;
-        console.log(user);
-        this._userService.createUser(user).subscribe(function (data) {
-            console.log(data);
-            _this.getUsers();
-        });
+        if (this.form.valid) {
+            this._userService.createUser(user).subscribe(function (data) {
+                console.log(data);
+                _this.form.reset();
+                _this.getUsers();
+            });
+        }
     };
-    UserListComponent.prototype.onRowClick = function ($event, id) {
-        console.log($event.target.outerText, id);
+    UserListComponent.prototype.editUser = function (user) {
+        this.form.controls['firstname'].setValue(user.firstname);
+        this.form.controls['lastname'].setValue(user.lastname);
+        this.form.controls['email'].setValue(user.email);
+        this.addFormVisible = false;
+        this.edit = true;
     };
     UserListComponent = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_1__angular_core__["m" /* Component */])({

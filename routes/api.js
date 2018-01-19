@@ -63,8 +63,8 @@ router.put('/user/:id', (req, res) => {
             email: body.email,
             firstname: body.firstname,
             lastname: body.lastname
-        }).then(res => {
-            if (!res) {
+        }).then(result => {
+            if (!result) {
                 res.status(400).json({
                     success: false,
                     message: 'No such user'
@@ -79,7 +79,7 @@ router.put('/user/:id', (req, res) => {
             res.status(400).json({
                 success: false,
                 message: e.message
-            });
+            })
         });
     }
 });
